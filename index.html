@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Base64解码结果</title>
+</head>
+<body>
+    <pre id="decodedContent"></pre>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            const resultElement = document.getElementById('decodedContent');
+            
+            try {
+                // 获取API的Base64内容
+                const response = await fetch('https://pokesub.go52pokemon.com/api/v1/client/subscribe?token=dd921e27c48d4e28d540ae5746a31b89');
+                
+                if (!response.ok) {
+                    throw new Error(`请求失败: ${response.status} ${response.statusText}`);
+                }
+                
+                const base64String = await response.text();
+                
+                // 解码Base64内容
+                const decodedText = decodeBase64(base64String);
+                
+                // 显示解码结果
+                resultElement.textContent = decodedText;
+            } catch (error) {
+                resultElement.textContent = `错误: ${error.message}`;
+            }
+            
+            // Base64解码函数（支持UTF-8字符）
+            function decodeBase64(base64String) {
+                try {
+                    // 清除可能的空白字符
+                    const cleanBase64 = base64String.trim();
+                    
+                    // 标准Base64解码
+                    const binaryString = atob(cleanBase64);
+                    
+                    // 转换为UTF-8编码
+                    const bytes = new Uint8Array(binaryString.length);
+                    for (let i = 0; i < binaryString.length; i++) {
+                        bytes[i] = binaryString.charCodeAt(i);
+                    }
+                    
+                    return new TextDecoder('utf-8').decode(bytes);
+                } catch (error) {
+                    throw new Error('Base64解码失败: ' + error.message);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
